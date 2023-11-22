@@ -1,44 +1,40 @@
 using Microsoft.AspNetCore.Mvc;
 using Web_API_AspNet.Entity;
 using Web_API_AspNet.DB;
+using Web_API_AspNet.Services;
 
 namespace Web_API_AspNet.Controllers
 {
 	[ApiController]
-	[Route("crud/person")]
+	[Route("{collection}/person")]
 	public class PersonController : ControllerBase
 	{
-		private static readonly string[] Summaries = new[]
+		private readonly PersonService _personService;
+		public PersonController(PersonService personService)
 		{
-		"Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-	};
-
-		private readonly ILogger<PersonController> _logger;
-
-		public PersonController(ILogger<PersonController> logger)
-		{
-			_logger = logger;
-		}
-
-		[HttpGet(Name = "GetWeatherForecast")]
-		public IEnumerable<WeatherForecast> GetWeatherForecastGet()
-		{
-			return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-			{
-				Date = DateTime.Now.AddDays(index),
-				TemperatureC = Random.Shared.Next(-20, 55),
-				Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-			})
-			.ToArray();
+			_personService = personService;
 		}
 
 		[HttpPost]
-		public IActionResult Create(Person person)
+		public async Task<IActionResult> Create([FromBody] Person person)
 		{
-			if (person == null)
-				return BadRequest();
-			return Ok();
+			try
+			{
+				if (person == null)
+				{
+					return BadRequest("Object null");
+				}
+
+				var personDB = await _personService.CreateAsync(person);
+
+				return Ok(personDB);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, "Ocorreu um erro interno no servidor: " + ex.Message);
+			}
 		}
+
 
 	}
 }
