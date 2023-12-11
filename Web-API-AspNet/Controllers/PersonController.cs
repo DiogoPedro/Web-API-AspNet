@@ -6,7 +6,7 @@ using Web_API_AspNet.Services;
 namespace Web_API_AspNet.Controllers
 {
 	[ApiController]
-	[Route("{collection}/person")]
+	[Route("person/data")]
 	public class PersonController : ControllerBase
 	{
 		private readonly PersonService _personService;
