@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Web_API_AspNet.Services
 {
@@ -25,15 +26,28 @@ namespace Web_API_AspNet.Services
             }
         }
 
+        //public async Task<T> ReadAsync(string id)
+        //{
+        //    var filter = Builders<T>.Filter.Eq("ObjectId", id);
+        //    return await _collection.Find(filter).FirstOrDefaultAsync();
+        //}
+
         public async Task<T> ReadAsync(string id)
         {
-            var filter = Builders<T>.Filter.Eq("_id", id);
+            var filter = Builders<T>.Filter.Eq("_id", ObjectId.Parse(id));
             return await _collection.Find(filter).FirstOrDefaultAsync();
         }
 
+
+        public async Task<List<T>> ReadAllAsync()
+        {
+            var filter = Builders<T>.Filter.Empty;
+            return await _collection.Find(filter).ToListAsync();
+        }   
+
         public async Task<T> UpdateAsync(string id, T entity)
         {
-            var filter = Builders<T>.Filter.Eq("_id", id);
+            var filter = Builders<T>.Filter.Eq("_id", ObjectId.Parse(id));
             await _collection.ReplaceOneAsync(filter, entity);
             return entity;
         }
